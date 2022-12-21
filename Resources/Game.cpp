@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Utils.h"
+#include "Object.h"
 
 Game::Game() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -14,7 +15,6 @@ Game::Game() {
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL)
 		utils::print_sdl_error("An error occured while trying to create the renderer.");
-	SDL_SetRenderDrawColor(renderer, 0, 153, 0, 255);
 
 	game_loop();
 }
@@ -55,7 +55,10 @@ void Game::game_loop() {
 }
 
 void Game::render() {
+	SDL_SetRenderDrawColor(renderer, 0, 153, 0, 255);
 	SDL_RenderClear(renderer);
+
+
 
 	SDL_RenderPresent(renderer);
 }
