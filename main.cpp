@@ -1,6 +1,8 @@
-#include <SDL.h>
+#include "Game.h"
 
-int main(int arg, char* args[]) {
+int main(int argc, char* args[]) {
+
+	Game();
 
 	return 0;
 }
