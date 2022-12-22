@@ -9,14 +9,15 @@
 class Snake {
 private:
 	std::vector<Object> snake_body;
-	utils::directions snake_direction;
-	float snake_speed = 100.0f;
+	float snake_speed = 0.0f;
+	float snake_size = 0.0f;
 public:
 	Snake();
-	Snake(utils::vector2f pos);
+	Snake(utils::vector2f pos, float p_snake_size);
 	void render(SDL_Renderer* renderer);
 	void feed();
-	void walk(float delta_time);
-	void change_direction(utils::directions new_direction);
-	utils::directions& get_direction();
+	void walk(unsigned int width, unsigned int height);
+	void change_head_direction(utils::directions new_direction);
+	utils::directions& get_head_direction();
+	Object& get_head();
 };

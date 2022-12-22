@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "Utils.h"
 
-Object::Object(utils::vector2f p_pos, float p_width, float p_height)
+Object::Object(utils::vector2f p_pos, float p_width, float p_height, utils::directions p_orientation)
 	:pos(p_pos), width(p_width), height(p_height) {
 	
 	rect.x = (int) pos.x;
@@ -11,6 +11,7 @@ Object::Object(utils::vector2f p_pos, float p_width, float p_height)
 	rect.w = (int) width;
 	rect.h = (int) height;
 
+	orientation = p_orientation;
 }
 
 void Object::render(SDL_Renderer* renderer) {
@@ -34,4 +35,12 @@ void Object::set_pos(utils::vector2f new_pos) {
 
 utils::vector2f& Object::get_pos() {
 	return pos;
+}
+
+void Object::set_orientation(utils::directions new_orientation) {
+	orientation = new_orientation;
+}
+
+utils::directions& Object::get_orientation() {
+	return orientation;
 }

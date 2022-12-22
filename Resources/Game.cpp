@@ -4,7 +4,8 @@
 #include "Utils.h"
 #include "Object.h"
 
-Game::Game() {
+Game::Game()
+	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE) {
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
 		SDL_Quit();
@@ -25,7 +26,7 @@ Game::Game() {
 		return;
 	}
 
-	snake = Snake(utils::vector2f(200, 200));
+	snake = Snake(utils::vector2f(200, 200), (float) SNAKE_SIZE);
 
 	game_loop();
 }
@@ -36,7 +37,7 @@ Game::~Game() {
 
 void Game::game_loop() {
 
-	const float delta_time = 0.01f;
+	const float delta_time = 0.1f;
 
 	float current_time = utils::hire_time_in_seconds(),
 		accumulator = 0.0f;
@@ -55,7 +56,7 @@ void Game::game_loop() {
 
 			controller(event);
 
-			snake.walk(delta_time);
+			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 			accumulator -= delta_time;
 		}
@@ -67,8 +68,31 @@ void Game::game_loop() {
 }
 
 void Game::render() {
-	SDL_SetRenderDrawColor(renderer, 0, 153, 0, 255);
+	SDL_SetRenderDrawColor(renderer, 42, 130, 53, 255);
+
 	SDL_RenderClear(renderer);
+
+	// Background
+	SDL_Rect square;
+	square.w = square.h = SNAKE_SIZE;
+	unsigned int x = 0, y = 0;
+
+	SDL_SetRenderDrawColor(renderer, 58, 180, 73, 255);
+
+	for (unsigned int i = 0; i < background_rows; ++i) {
+		x = (i & 1) ? 0 : SNAKE_SIZE;
+		square.y = y;
+
+		for (unsigned int j = (i & 1) ? 0 : 1; j < background_cols; ++j) {
+			square.x = x;
+
+			SDL_RenderFillRect(renderer, &square);
+
+			x += SNAKE_SIZE * 2;
+		}
+
+		y += SNAKE_SIZE;
+	}
 
 	snake.render(renderer);
 
@@ -82,31 +106,35 @@ void Game::controller(SDL_Event& event) {
 		if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
 				case SDLK_w: {
-					if (snake.get_direction() == utils::directions::DOWN) break;
+					if (snake.get_head_direction() == utils::directions::DOWN) break;
 
-					snake.change_direction(utils::directions::UP);
+					snake.change_head_direction(utils::directions::UP);
 
 					break;
 				}
 				case SDLK_s: {
-					if (snake.get_direction() == utils::directions::UP) break;
+					if (snake.get_head_direction() == utils::directions::UP) break;
 
-					snake.change_direction(utils::directions::DOWN);
+					snake.change_head_direction(utils::directions::DOWN);
 
 					break;
 				}
 				case SDLK_a: {
-					if (snake.get_direction() == utils::directions::RIGHT) break;
+					if (snake.get_head_direction() == utils::directions::RIGHT) break;
 
-					snake.change_direction(utils::directions::LEFT);
+					snake.change_head_direction(utils::directions::LEFT);
 
 					break;
 				}
 				case SDLK_d: {
-					if (snake.get_direction() == utils::directions::LEFT) break;
+					if (snake.get_head_direction() == utils::directions::LEFT) break;
 
-					snake.change_direction(utils::directions::RIGHT);
+					snake.change_head_direction(utils::directions::RIGHT);
 
+					break;
+				}
+				case SDLK_f: {
+					snake.feed();
 					break;
 				}
 			}

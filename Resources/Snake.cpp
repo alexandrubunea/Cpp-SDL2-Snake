@@ -6,51 +6,123 @@
 #include "Object.h"
 
 Snake::Snake()
-	: snake_direction(utils::directions::UP) {}
-Snake::Snake(utils::vector2f pos)
-	: snake_direction(utils::directions::UP) {
-	snake_body.push_back(Object(pos, 25, 25));
+	: snake_size(0.0f) {}
+
+Snake::Snake(utils::vector2f pos, float p_snake_size)
+	: snake_size(p_snake_size) {
+
+	snake_body.push_back(Object(pos, snake_size, snake_size, utils::directions::UP));
+	snake_speed = snake_size;
+
+	feed();
+	feed();
 }
 
 void Snake::render(SDL_Renderer* renderer) {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	for (Object& obj : snake_body)
-		obj.render(renderer);
+	SDL_SetRenderDrawColor(renderer, 201, 62, 218, 255);
+	get_head().render(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 238, 130, 238, 255);
+	for (unsigned int i = 1; i < snake_body.size(); ++i)
+		snake_body[i].render(renderer);
 }
 
 void Snake::feed() {
 	Object& tail_end = snake_body[snake_body.size() - 1];
-}
+	utils::vector2f pos = tail_end.get_pos();
 
-void Snake::walk(float delta_time) {
-	switch (snake_direction) {
+	switch (tail_end.get_orientation()) {
 		case utils::directions::UP: {
-			snake_body[0].modify_y_by(-(delta_time * snake_speed));
+			pos.y = tail_end.get_pos().y + snake_size;
 
 			break;
 		}
 		case utils::directions::DOWN: {
-			snake_body[0].modify_y_by(delta_time * snake_speed);
+			pos.y = tail_end.get_pos().y - snake_size;
 
 			break;
 		}
 		case utils::directions::LEFT: {
-			snake_body[0].modify_x_by(-(delta_time * snake_speed));
+			pos.x = tail_end.get_pos().x + snake_size;
 
 			break;
 		}
 		case utils::directions::RIGHT: {
-			snake_body[0].modify_x_by(delta_time * snake_speed);
+			pos.x = tail_end.get_pos().x - snake_size;
 
 			break;
 		}
 	}
+
+	snake_body.push_back(Object(pos, snake_size, snake_size, tail_end.get_orientation()));
 }
 
-void Snake::change_direction(utils::directions new_direction) {
-	snake_direction = new_direction;
+void Snake::walk(unsigned int width, unsigned int height) {
+
+	utils::vector2f old_pos = get_head().get_pos();
+	utils::directions old_orientation = get_head_direction();
+
+	switch (get_head_direction()) {
+		case utils::directions::UP: {
+			snake_body[0].modify_y_by(-snake_speed);
+
+			break;
+		}
+		case utils::directions::DOWN: {
+			snake_body[0].modify_y_by(snake_speed);
+
+			break;
+		}
+		case utils::directions::LEFT: {
+			snake_body[0].modify_x_by(-snake_speed);
+
+			break;
+		}
+		case utils::directions::RIGHT: {
+			snake_body[0].modify_x_by(snake_speed);
+
+			break;
+		}
+	}
+
+	utils::vector2f aux_pos;
+	utils::directions aux_dir;
+
+	for (unsigned int i = 1; i < snake_body.size(); ++i) {
+		aux_pos = snake_body[i].get_pos();
+		aux_dir = snake_body[i].get_orientation();
+
+		snake_body[i].set_pos(old_pos);
+		snake_body[i].set_orientation(old_orientation);
+
+		old_pos = aux_pos;
+		old_orientation = aux_dir;
+	}
+
+	Object& head = get_head();
+	float new_x = head.get_pos().x, new_y = head.get_pos().y;
+
+	if (head.get_pos().y < 0)
+		new_y = height;
+	else if (head.get_pos().y >= height)
+		new_y = 0;
+
+	if (head.get_pos().x < 0)
+		new_x = width;
+	else if (head.get_pos().x >= width)
+		new_x = 0;
+
+	head.set_pos(utils::vector2f(new_x, new_y));
 }
 
-utils::directions& Snake::get_direction() {
-	return snake_direction;
+void Snake::change_head_direction(utils::directions new_direction) {
+	snake_body[0].set_orientation(new_direction);
+}
+
+utils::directions& Snake::get_head_direction() {
+	return snake_body[0].get_orientation();
+}
+
+Object& Snake::get_head() {
+	return snake_body[0];
 }
