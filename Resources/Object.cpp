@@ -6,14 +6,24 @@
 Object::Object(utils::vector2f p_pos, float p_width, float p_height)
 	:pos(p_pos), width(p_width), height(p_height) {
 	
-	rect.x = pos.x;
-	rect.y = pos.y;
-	rect.w = width;
-	rect.h = height;
+	rect.x = (int) pos.x;
+	rect.y = (int) pos.y;
+	rect.w = (int) width;
+	rect.h = (int) height;
 
 }
 
-void Object::render(SDL_Renderer* renderer, int r, int g, int b, int a) {
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+void Object::render(SDL_Renderer* renderer) {
+	rect.x = (int) pos.x;
+	rect.y = (int) pos.y;
+
 	SDL_RenderFillRect(renderer, &rect);
+}
+
+void Object::modify_x_by(float modifier) {
+	pos.x += modifier;
+}
+
+void Object::modify_y_by(float modifier) {
+	pos.y += modifier;
 }

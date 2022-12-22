@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 
+#include "Snake.h"
+
 class Game {
 private:
 	const unsigned int SCREEN_WIDTH = 800;
@@ -11,12 +13,14 @@ private:
 
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
-	SDL_Event event;
 
 	bool game_running = true;
+
+	Snake snake;
 public:
 	Game();
 	~Game();
 	void game_loop();
 	void render();
+	void controller(SDL_Event& event);
 };

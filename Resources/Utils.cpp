@@ -10,3 +10,7 @@ void utils::print_sdl_error(const char* error_text) {
 int utils::hire_time_in_seconds() {
 	return SDL_GetTicks();
 }
+
+void utils::print(const char* text) {
+	std::cout << text << std::endl;
+}
