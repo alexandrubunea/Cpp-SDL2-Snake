@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <vector>
 
 #include "Snake.h"
 
@@ -21,6 +22,8 @@ private:
 	Snake snake;
 
 	unsigned int background_rows, background_cols;
+
+	std::vector<SDL_Rect> background;
 public:
 	Game();
 	~Game();

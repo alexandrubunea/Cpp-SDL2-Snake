@@ -28,6 +28,25 @@ Game::Game()
 
 	snake = Snake(utils::vector2f(200, 200), (float) SNAKE_SIZE);
 
+	SDL_Rect square;
+	square.w = square.h = SNAKE_SIZE;
+	unsigned int x = 0, y = 0;
+
+	for (unsigned int i = 0; i < background_rows; ++i) {
+		x = (i & 1) ? 0 : SNAKE_SIZE;
+		square.y = y;
+
+		for (unsigned int j = (i & 1) ? 0 : 1; j < background_cols; ++j) {
+			square.x = x;
+
+			background.push_back(square);
+
+			x += SNAKE_SIZE * 2;
+		}
+
+		y += SNAKE_SIZE;
+	}
+
 	game_loop();
 }
 Game::~Game() {
@@ -73,26 +92,10 @@ void Game::render() {
 	SDL_RenderClear(renderer);
 
 	// Background
-	SDL_Rect square;
-	square.w = square.h = SNAKE_SIZE;
-	unsigned int x = 0, y = 0;
-
 	SDL_SetRenderDrawColor(renderer, 58, 180, 73, 255);
 
-	for (unsigned int i = 0; i < background_rows; ++i) {
-		x = (i & 1) ? 0 : SNAKE_SIZE;
-		square.y = y;
-
-		for (unsigned int j = (i & 1) ? 0 : 1; j < background_cols; ++j) {
-			square.x = x;
-
-			SDL_RenderFillRect(renderer, &square);
-
-			x += SNAKE_SIZE * 2;
-		}
-
-		y += SNAKE_SIZE;
-	}
+	for (unsigned int i = 0; i < background.size(); ++i)
+		SDL_RenderFillRect(renderer, &background[i]);
 
 	snake.render(renderer);
 
