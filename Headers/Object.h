@@ -14,4 +14,6 @@ public:
 	void render(SDL_Renderer* renderer);
 	void modify_x_by(float modifier);
 	void modify_y_by(float modifier);
+	void set_pos(utils::vector2f new_pos);
+	utils::vector2f& get_pos();
 };

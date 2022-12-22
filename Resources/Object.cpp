@@ -27,3 +27,11 @@ void Object::modify_x_by(float modifier) {
 void Object::modify_y_by(float modifier) {
 	pos.y += modifier;
 }
+
+void Object::set_pos(utils::vector2f new_pos) {
+	pos = new_pos;
+}
+
+utils::vector2f& Object::get_pos() {
+	return pos;
+}

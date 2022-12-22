@@ -10,7 +10,7 @@ class Snake {
 private:
 	std::vector<Object> snake_body;
 	utils::directions snake_direction;
-	float snake_speed = 0.1f;
+	float snake_speed = 100.0f;
 public:
 	Snake();
 	Snake(utils::vector2f pos);

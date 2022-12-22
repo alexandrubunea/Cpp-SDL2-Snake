@@ -19,7 +19,7 @@ void Snake::render(SDL_Renderer* renderer) {
 }
 
 void Snake::feed() {
-
+	Object& tail_end = snake_body[snake_body.size() - 1];
 }
 
 void Snake::walk(float delta_time) {

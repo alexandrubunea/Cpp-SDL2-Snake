@@ -38,14 +38,14 @@ void Game::game_loop() {
 
 	const float delta_time = 0.01f;
 
-	float current_time = (float) utils::hire_time_in_seconds(),
+	float current_time = utils::hire_time_in_seconds(),
 		accumulator = 0.0f;
 
 	SDL_Event event;
 
 	while (game_running) {
 
-		float new_time = (float) utils::hire_time_in_seconds(),
+		float new_time = utils::hire_time_in_seconds(),
 			frame_time = new_time - current_time;
 		current_time = new_time;
 		
@@ -79,34 +79,36 @@ void Game::controller(SDL_Event& event) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT)
 			game_running = false;
-		switch (event.key.keysym.sym) {
-			case SDLK_w: {
-				if (snake.get_direction() == utils::directions::DOWN) break;
+		if (event.type == SDL_KEYDOWN) {
+			switch (event.key.keysym.sym) {
+				case SDLK_w: {
+					if (snake.get_direction() == utils::directions::DOWN) break;
 
-				snake.change_direction(utils::directions::UP);
+					snake.change_direction(utils::directions::UP);
 
-				break;
-			}
-			case SDLK_s: {
-				if (snake.get_direction() == utils::directions::UP) break;
+					break;
+				}
+				case SDLK_s: {
+					if (snake.get_direction() == utils::directions::UP) break;
 
-				snake.change_direction(utils::directions::DOWN);
+					snake.change_direction(utils::directions::DOWN);
 
-				break;
-			}
-			case SDLK_a: {
-				if (snake.get_direction() == utils::directions::RIGHT) break;
+					break;
+				}
+				case SDLK_a: {
+					if (snake.get_direction() == utils::directions::RIGHT) break;
 
-				snake.change_direction(utils::directions::LEFT);
+					snake.change_direction(utils::directions::LEFT);
 
-				break;
-			}
-			case SDLK_d: {
-				if (snake.get_direction() == utils::directions::LEFT) break;
+					break;
+				}
+				case SDLK_d: {
+					if (snake.get_direction() == utils::directions::LEFT) break;
 
-				snake.change_direction(utils::directions::RIGHT);
+					snake.change_direction(utils::directions::RIGHT);
 
-				break;
+					break;
+				}
 			}
 		}
 	}

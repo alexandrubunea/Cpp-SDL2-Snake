@@ -3,9 +3,7 @@
 namespace utils {
 
 	void print_sdl_error(const char* error_text);
-	int hire_time_in_seconds();
-
-	void print(const char* text);
+	float hire_time_in_seconds();
 
 	struct vector2f {
 		float x, y;
