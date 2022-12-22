@@ -16,8 +16,9 @@ public:
 	Snake(utils::vector2f pos, float p_snake_size);
 	void render(SDL_Renderer* renderer);
 	void feed();
-	void walk(unsigned int width, unsigned int height);
+	void walk(unsigned int width, unsigned int height, unsigned int toolbar_height);
 	void change_head_direction(utils::directions new_direction);
 	utils::directions& get_head_direction();
 	Object& get_head();
+	std::vector<Object>& get_snake_body();
 };

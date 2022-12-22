@@ -57,7 +57,7 @@ void Snake::feed() {
 	snake_body.push_back(Object(pos, snake_size, snake_size, tail_end.get_orientation()));
 }
 
-void Snake::walk(unsigned int width, unsigned int height) {
+void Snake::walk(unsigned int width, unsigned int height, unsigned int toolbar_height) {
 
 	utils::vector2f old_pos = get_head().get_pos();
 	utils::directions old_orientation = get_head_direction();
@@ -102,13 +102,13 @@ void Snake::walk(unsigned int width, unsigned int height) {
 	Object& head = get_head();
 	float new_x = head.get_pos().x, new_y = head.get_pos().y;
 
-	if (head.get_pos().y < 0)
-		new_y = height;
+	if (head.get_pos().y < toolbar_height)
+		new_y = (float) height;
 	else if (head.get_pos().y >= height)
-		new_y = 0;
+		new_y = (float) toolbar_height;
 
 	if (head.get_pos().x < 0)
-		new_x = width;
+		new_x = (float) width;
 	else if (head.get_pos().x >= width)
 		new_x = 0;
 
@@ -125,4 +125,8 @@ utils::directions& Snake::get_head_direction() {
 
 Object& Snake::get_head() {
 	return snake_body[0];
+}
+
+std::vector<Object>& Snake::get_snake_body() {
+	return snake_body;
 }

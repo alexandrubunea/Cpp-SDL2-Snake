@@ -1,11 +1,15 @@
 #include <SDL.h>
+#include <cmath>
+#include <time.h>
+#include <vector>
 
 #include "Game.h"
 #include "Utils.h"
 #include "Object.h"
 
 Game::Game()
-	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE) {
+	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}) {
+	
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
 		SDL_Quit();
@@ -31,7 +35,6 @@ Game::Game()
 	SDL_Rect square;
 	square.w = square.h = SNAKE_SIZE;
 	unsigned int x = 0, y = 0;
-
 	for (unsigned int i = 0; i < background_rows; ++i) {
 		x = (i & 1) ? 0 : SNAKE_SIZE;
 		square.y = y;
@@ -46,6 +49,19 @@ Game::Game()
 
 		y += SNAKE_SIZE;
 	}
+
+	toolbar.x = toolbar.y = 0;
+	toolbar.w = SCREEN_WIDTH;
+	toolbar.h = TOOLBAR_HEIGHT;
+
+	srand(time(NULL));
+
+	fruit.x = (float) (rand() % (background_cols - 1));
+	fruit.y = (float) (rand() % (background_rows - 1) + (TOOLBAR_HEIGHT / SNAKE_SIZE));
+
+	fruit_rect.x = (int) (fruit.x * SNAKE_SIZE);
+	fruit_rect.y = (int) (fruit.y * SNAKE_SIZE);
+	fruit_rect.w = fruit_rect.h = SNAKE_SIZE;
 
 	game_loop();
 }
@@ -75,7 +91,30 @@ void Game::game_loop() {
 
 			controller(event);
 
-			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT);
+			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT, TOOLBAR_HEIGHT);
+
+			if (snake.get_head().get_pos() == utils::vector2f((float) fruit_rect.x, (float) fruit_rect.y)) {
+
+				snake.feed();
+
+				bool is_valid_position = false;
+				std::vector<Object> snake_tail = snake.get_snake_body();
+
+				while (!is_valid_position) {
+					is_valid_position = true;
+
+					fruit.x = (float)(rand() % (background_cols - 1));
+					fruit.y = (float)(rand() % (background_rows - 1) + (TOOLBAR_HEIGHT / SNAKE_SIZE));
+
+					for (unsigned int i = 0; i < snake_tail.size(); ++i)
+						if (snake_tail[i].get_pos() == utils::vector2f((float) (fruit.x * SNAKE_SIZE), (float) (fruit.y * SNAKE_SIZE)))
+							is_valid_position = false;
+				}
+
+				fruit_rect.x = (int) (fruit.x * SNAKE_SIZE);
+				fruit_rect.y = (int) (fruit.y * SNAKE_SIZE);
+
+			}
 
 			accumulator -= delta_time;
 		}
@@ -93,9 +132,16 @@ void Game::render() {
 
 	// Background
 	SDL_SetRenderDrawColor(renderer, 58, 180, 73, 255);
-
 	for (unsigned int i = 0; i < background.size(); ++i)
 		SDL_RenderFillRect(renderer, &background[i]);
+
+	// Toolbar
+	SDL_SetRenderDrawColor(renderer, 15, 15, 15, 255);
+	SDL_RenderFillRect(renderer, &toolbar);
+
+	// Fruit
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_RenderFillRect(renderer, &fruit_rect);
 
 	snake.render(renderer);
 

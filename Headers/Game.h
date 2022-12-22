@@ -24,6 +24,12 @@ private:
 	unsigned int background_rows, background_cols;
 
 	std::vector<SDL_Rect> background;
+	SDL_Rect toolbar;
+	const unsigned int TOOLBAR_HEIGHT = 40;
+
+	utils::vector2f fruit;
+	SDL_Rect fruit_rect;
+
 public:
 	Game();
 	~Game();

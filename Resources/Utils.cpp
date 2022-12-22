@@ -12,3 +12,7 @@ float utils::hire_time_in_seconds() {
 	t *= 0.001f;
 	return t;
 }
+
+bool utils::vector2f::operator==(utils::vector2f aux) {
+	return (int) x == (int) aux.x && (int) y == (int) aux.y;
+}
