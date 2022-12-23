@@ -10,7 +10,7 @@
 #include "Object.h"
 
 Game::Game()
-	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}), score_rect_dest({0, 0, 0, 0}) {
+	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}), score_rect_dest({0, 0, 0, 0}), game_state(Game::GameState::NONE){
 	
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
@@ -80,6 +80,8 @@ Game::Game()
 	score_rect_dest.h = 20;
 	score_rect_dest.w = 0;
 
+	game_state = Game::GameState::GAME_RUNNING;
+
 	game_loop();
 
 	SDL_Quit();
@@ -109,11 +111,23 @@ void Game::game_loop() {
 		accumulator += frame_time;
 
 		while (accumulator >= delta_time) {
+			std::vector<Object> snake_body = snake.get_snake_body();
 
 			controller(event);
 
+			if (game_state == Game::GameState::GAME_OVER)
+				goto NON_GAMEPLAY;
+
+
 			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT, TOOLBAR_HEIGHT);
 
+			for (unsigned int i = 1; i < snake_body.size(); ++i) {
+				if (snake.get_head().get_pos() == snake_body[i].get_pos()) {
+					game_state = Game::GameState::GAME_OVER;
+					break;
+				}
+			}
+			
 			if (snake.get_head().get_pos() == utils::vector2f((float) fruit_rect.x, (float) fruit_rect.y)) {
 
 				snake.feed();
@@ -148,7 +162,8 @@ void Game::game_loop() {
 				score_rect_dest.w = score_str.size() * FONT_SCORE_SIZE;
 			}
 
-			accumulator -= delta_time;
+			NON_GAMEPLAY:
+				accumulator -= delta_time;
 		}
 
 		render();
