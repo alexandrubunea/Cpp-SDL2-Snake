@@ -39,14 +39,6 @@ private:
 	const unsigned int FONT_SCORE_SIZE = 15;
 
 	unsigned int player_score = 0;
-
-	enum GameState {
-		NONE,
-		GAME_RUNNING,
-		GAME_OVER
-	};
-
-	GameState game_state;
 public:
 	Game();
 	~Game();

@@ -10,7 +10,7 @@
 #include "Object.h"
 
 Game::Game()
-	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}), score_rect_dest({0, 0, 0, 0}), game_state(Game::GameState::NONE){
+	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}), score_rect_dest({0, 0, 0, 0}) {
 	
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
@@ -72,15 +72,13 @@ Game::Game()
 	fruit_rect.y = (int) (fruit.y * SNAKE_SIZE);
 	fruit_rect.w = fruit_rect.h = SNAKE_SIZE;
 
-	surface_score = TTF_RenderText_Solid(score_font, "", { 255, 255, 255 });
+	surface_score = TTF_RenderText_Solid(score_font, "YOUR SCORE: 0", { 255, 255, 255 });
 	score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
 
 	score_rect_dest.x = 20;
 	score_rect_dest.y = TOOLBAR_HEIGHT / 2 - FONT_SCORE_SIZE;
 	score_rect_dest.h = 20;
 	score_rect_dest.w = 0;
-
-	game_state = Game::GameState::GAME_RUNNING;
 
 	game_loop();
 
@@ -115,15 +113,20 @@ void Game::game_loop() {
 
 			controller(event);
 
-			if (game_state == Game::GameState::GAME_OVER)
-				goto NON_GAMEPLAY;
-
-
 			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT, TOOLBAR_HEIGHT);
 
 			for (unsigned int i = 1; i < snake_body.size(); ++i) {
 				if (snake.get_head().get_pos() == snake_body[i].get_pos()) {
-					game_state = Game::GameState::GAME_OVER;
+					snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
+
+					player_score = 0;
+					std::string score_str = "YOUR SCORE: " + std::to_string(player_score);
+
+					SDL_FreeSurface(surface_score);
+					surface_score = TTF_RenderText_Solid(score_font, score_str.c_str(), { 255, 255, 255 });
+
+					SDL_DestroyTexture(score_texture);
+					score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
 					break;
 				}
 			}
@@ -162,8 +165,7 @@ void Game::game_loop() {
 				score_rect_dest.w = score_str.size() * FONT_SCORE_SIZE;
 			}
 
-			NON_GAMEPLAY:
-				accumulator -= delta_time;
+			accumulator -= delta_time;
 		}
 
 		render();
