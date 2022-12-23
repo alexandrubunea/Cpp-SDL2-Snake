@@ -16,3 +16,7 @@ float utils::hire_time_in_seconds() {
 bool utils::vector2f::operator==(utils::vector2f aux) {
 	return (int) x == (int) aux.x && (int) y == (int) aux.y;
 }
+
+void utils::vector2f::print() {
+	std::cout << x << ", " << y << std::endl;
+}

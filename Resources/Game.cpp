@@ -1,5 +1,7 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <cmath>
+#include <string>
 #include <time.h>
 #include <vector>
 
@@ -8,7 +10,7 @@
 #include "Object.h"
 
 Game::Game()
-	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}) {
+	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }), fruit_rect({0, 0, 0, 0}), score_rect_dest({0, 0, 0, 0}) {
 	
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
@@ -29,6 +31,13 @@ Game::Game()
 		SDL_Quit();
 		return;
 	}
+
+	if (TTF_Init() == -1)
+		utils::print_sdl_error("An error occured while trying to use TTF_Init().");
+
+	score_font = TTF_OpenFont("arial.ttf", FONT_SCORE_SIZE);
+	if (score_font == NULL)
+		utils::print_sdl_error("An error occured while trying to load the score font.");
 
 	snake = Snake(utils::vector2f(200, 200), (float) SNAKE_SIZE);
 
@@ -54,7 +63,7 @@ Game::Game()
 	toolbar.w = SCREEN_WIDTH;
 	toolbar.h = TOOLBAR_HEIGHT;
 
-	srand(time(NULL));
+	srand((unsigned int) time(NULL));
 
 	fruit.x = (float) (rand() % (background_cols - 1));
 	fruit.y = (float) (rand() % (background_rows - 1) + (TOOLBAR_HEIGHT / SNAKE_SIZE));
@@ -63,7 +72,19 @@ Game::Game()
 	fruit_rect.y = (int) (fruit.y * SNAKE_SIZE);
 	fruit_rect.w = fruit_rect.h = SNAKE_SIZE;
 
+	surface_score = TTF_RenderText_Solid(score_font, "", { 255, 255, 255 });
+	score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
+
+	score_rect_dest.x = 20;
+	score_rect_dest.y = TOOLBAR_HEIGHT / 2 - FONT_SCORE_SIZE;
+	score_rect_dest.h = 20;
+	score_rect_dest.w = 0;
+
 	game_loop();
+
+	SDL_Quit();
+	TTF_CloseFont(score_font);
+	TTF_Quit();
 }
 Game::~Game() {
 	SDL_DestroyWindow(window);
@@ -114,6 +135,17 @@ void Game::game_loop() {
 				fruit_rect.x = (int) (fruit.x * SNAKE_SIZE);
 				fruit_rect.y = (int) (fruit.y * SNAKE_SIZE);
 
+				++player_score;
+
+				std::string score_str = "YOUR SCORE: " + std::to_string(player_score);
+
+				SDL_FreeSurface(surface_score);
+				surface_score = TTF_RenderText_Solid(score_font, score_str.c_str(), { 255, 255, 255 });
+				
+				SDL_DestroyTexture(score_texture);
+				score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
+
+				score_rect_dest.w = score_str.size() * FONT_SCORE_SIZE;
 			}
 
 			accumulator -= delta_time;
@@ -121,8 +153,6 @@ void Game::game_loop() {
 
 		render();
 	}
-
-	SDL_Quit();
 }
 
 void Game::render() {
@@ -143,7 +173,11 @@ void Game::render() {
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &fruit_rect);
 
+	// Snake
 	snake.render(renderer);
+
+	// Score
+	SDL_RenderCopy(renderer, score_texture, NULL, &score_rect_dest);
 
 	SDL_RenderPresent(renderer);
 }

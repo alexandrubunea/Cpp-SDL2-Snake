@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <vector>
 
 #include "Snake.h"
@@ -12,7 +13,7 @@ private:
 
 	const char* APPLICATION_NAME = "Snake Game";
 
-	const unsigned int SNAKE_SIZE = 20;
+	const unsigned int SNAKE_SIZE = 40;
 
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
@@ -30,6 +31,14 @@ private:
 	utils::vector2f fruit;
 	SDL_Rect fruit_rect;
 
+	SDL_Surface* surface_score = NULL;
+	SDL_Rect score_rect_dest;
+	SDL_Texture* score_texture = NULL;
+	TTF_Font* score_font = NULL;
+
+	const unsigned int FONT_SCORE_SIZE = 15;
+
+	unsigned int player_score = 0;
 public:
 	Game();
 	~Game();
